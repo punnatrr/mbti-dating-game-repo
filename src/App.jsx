@@ -439,6 +439,17 @@ function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, value));
 }
 
+function shuffleArray(array) {
+  const copied = [...array];
+
+  for (let index = copied.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [copied[index], copied[randomIndex]] = [copied[randomIndex], copied[index]];
+  }
+
+  return copied;
+}
+
 function getMaxScore(character) {
   return character.questions.reduce(
     (sum, question) => sum + Math.max(...question.options.map((option) => option.score)),
@@ -525,6 +536,7 @@ export default function App() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(null);
+  const [shuffledOptions, setShuffledOptions] = useState([]);
   const [log, setLog] = useState([]);
 
   const character = useMemo(
@@ -535,14 +547,18 @@ export default function App() {
   const maxScore = character ? getMaxScore(character) : 1;
   const percent = character ? clamp(Math.round((score / maxScore) * 100)) : 0;
   const currentQuestion = character?.questions[questionIndex];
+  const currentOptions = shuffledOptions.length > 0 ? shuffledOptions : currentQuestion?.options ?? [];
   const isFinished = Boolean(character && questionIndex >= character.questions.length);
   const ending = getEnding(percent);
 
   function startGame(id) {
+    const nextCharacter = CHARACTERS.find((item) => item.id === id);
+
     setSelectedId(id);
     setQuestionIndex(0);
     setScore(0);
     setAnswered(null);
+    setShuffledOptions(shuffleArray(nextCharacter?.questions[0]?.options ?? []));
     setLog([]);
   }
 
@@ -551,6 +567,7 @@ export default function App() {
     setQuestionIndex(0);
     setScore(0);
     setAnswered(null);
+    setShuffledOptions([]);
     setLog([]);
   }
 
@@ -569,8 +586,11 @@ export default function App() {
   }
 
   function nextQuestion() {
+    const nextIndex = questionIndex + 1;
+
     setAnswered(null);
-    setQuestionIndex((prev) => prev + 1);
+    setQuestionIndex(nextIndex);
+    setShuffledOptions(shuffleArray(character?.questions[nextIndex]?.options ?? []));
   }
 
   return (
@@ -660,10 +680,13 @@ export default function App() {
                   <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-rose-100 px-4 py-2 text-sm font-bold text-rose-700">
                     <Icon name="heart" /> สถานการณ์เดต
                   </div>
+                  <p className="mb-3 text-sm font-semibold text-slate-500">
+                    คำตอบถูกสุ่มตำแหน่งทุกข้อ เลือกจากความหมาย ไม่ใช่เลขข้อ
+                  </p>
                   <h3 className="text-2xl font-black leading-snug md:text-4xl">{currentQuestion.scene}</h3>
 
                   <div className="mt-8 grid gap-4">
-                    {currentQuestion.options.map((option, index) => {
+                    {currentOptions.map((option, index) => {
                       const isChosen = answered?.text === option.text;
                       return (
                         <button
