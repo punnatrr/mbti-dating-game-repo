@@ -68,6 +68,7 @@ const CHARACTERS = [
     color: "from-violet-200 via-fuchsia-100 to-indigo-100",
     textAccent: "text-violet-700",
     avatar: "🌙",
+    image: "/irin.png",
     profile:
       "อ่อนโยน ชอบบทสนทนาที่มีความหมาย รักความจริงใจ และไม่ชอบการคุยเล่นที่ดูไม่ใส่ใจ",
     questions: [
@@ -161,6 +162,7 @@ const CHARACTERS = [
     color: "from-orange-200 via-amber-100 to-yellow-100",
     textAccent: "text-orange-700",
     avatar: "⚡",
+    image: "/ren.png",
     profile: "ฉลาดไว ชอบความท้าทาย ชอบคนทันมุก กล้าคิดต่าง และไม่ซีเรียสจนเกินไป",
     questions: [
       {
@@ -253,6 +255,7 @@ const CHARACTERS = [
     color: "from-slate-200 via-blue-100 to-cyan-100",
     textAccent: "text-slate-700",
     avatar: "🕰️",
+    image: "/kant.png",
     profile: "สุขุม รับผิดชอบ ชอบความชัดเจน เคารพเวลา และประทับใจคนที่จริงใจผ่านการกระทำ",
     questions: [
       {
@@ -345,6 +348,7 @@ const CHARACTERS = [
     color: "from-pink-200 via-rose-100 to-yellow-100",
     textAccent: "text-pink-700",
     avatar: "🌈",
+    image: "/mew.png",
     profile: "สดใส ชอบความจริงใจ ความสนุก และคนที่เห็นคุณค่าในความเป็นตัวเองของเธอ",
     questions: [
       {
@@ -475,13 +479,24 @@ if (typeof window !== "undefined") {
 function Avatar({ character, large = false }) {
   return (
     <div
-      className={`relative grid place-items-center rounded-full bg-gradient-to-br ${character.color} shadow-inner ${
-        large ? "h-44 w-44 text-7xl" : "h-16 w-16 text-3xl"
+      className={`relative grid place-items-center overflow-hidden rounded-full bg-gradient-to-br ${character.color} shadow-inner ${
+        large ? "h-44 w-44" : "h-16 w-16"
       }`}
     >
       <div className="absolute inset-2 rounded-full border border-white/60" />
       <div className="absolute bottom-5 h-10 w-20 rounded-full bg-white/50 blur-xl" />
-      <span className="relative drop-shadow-sm">{character.avatar}</span>
+
+      {character.image ? (
+        <img
+          src={character.image}
+          alt={character.name}
+          className="relative z-10 h-full w-full object-cover"
+        />
+      ) : (
+        <span className={`relative z-10 drop-shadow-sm ${large ? "text-7xl" : "text-3xl"}`}>
+          {character.avatar}
+        </span>
+      )}
     </div>
   );
 }
@@ -680,7 +695,17 @@ export default function App() {
                       className="mt-7 rounded-3xl bg-gradient-to-br from-rose-50 to-indigo-50 p-5"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-xl shadow-sm">{character.avatar}</div>
+                        <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-white shadow-sm">
+                          {character.image ? (
+                            <img
+                              src={character.image}
+                              alt={character.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xl">{character.avatar}</span>
+                          )}
+                        </div>
                         <div>
                           <p className="font-bold text-slate-800">{answered.reply}</p>
                           <p className="mt-1 text-sm text-slate-500">คะแนนความประทับใจ +{answered.score}</p>
